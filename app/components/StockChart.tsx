@@ -54,7 +54,7 @@ const StockChart: React.FC<StockChartProps> = ({ data, symbol }) => {
           <Line type="monotone" dataKey="open" stroke="#82ca9d" />
         </LineChart>
       </ResponsiveContainer>
-      <div className="flex justify-end space-x-2 mt-4">
+      <div className="flex justify-end space-x-2 mt-4 px-9">
         <Button
           color={timePeriod === '1M' ? 'primary' : 'default'}
           onClick={() => handleTimePeriodChange('1M')}

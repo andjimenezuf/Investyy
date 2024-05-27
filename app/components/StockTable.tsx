@@ -2,15 +2,26 @@
 import React from 'react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip } from "@nextui-org/react";
 import { DeleteIcon } from './DeleteIcon';
+import Image from 'next/image';
+
+interface Stock {
+  symbol: string;
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  change: number;
+}
 
 interface StockTableProps {
-  stocks: any[];
+  stocks: Stock[];
   onDelete: (symbol: string) => void;
 }
 
 const StockTable: React.FC<StockTableProps> = ({ stocks, onDelete }) => {
   const columns = [
-    { name: "Ticker", uid: "ticker" },
+    { name: "Symbol", uid: "symbol" },
     { name: "Open", uid: "open" },
     { name: "High", uid: "high" },
     { name: "Low", uid: "low" },
@@ -20,14 +31,14 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, onDelete }) => {
     { name: "Actions", uid: "actions" },
   ];
 
-  const renderCell = (item, columnKey) => {
-    const cellValue = item[columnKey];
+  const renderCell = (item: Stock, columnKey: keyof Stock | "actions") => {
+    const cellValue = item[columnKey as keyof Stock];
 
     switch (columnKey) {
-      case "ticker":
+      case "symbol":
         return (
           <div className="flex items-center">
-            <img src={`https://logo.clearbit.com/${item.symbol.toLowerCase()}.com`} alt={item.symbol} className="w-8 h-8 mr-2"/>
+            <Image src={`https://logo.clearbit.com/${item.symbol.toLowerCase()}.com`} alt={item.symbol} width={32} height={32} className="mr-2"/>
             {item.symbol.toUpperCase()}
           </div>
         );
@@ -38,10 +49,11 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, onDelete }) => {
       case "date":
         return cellValue;
       case "change":
-        const changeColor = cellValue >= 0 ? "success" : "danger";
+        const changeValue = cellValue as number;
+        const changeColor = changeValue >= 0 ? "success" : "danger";
         return (
           <Chip className="capitalize" color={changeColor} size="sm" variant="flat">
-            {cellValue.toFixed(2)}%
+            {changeValue.toFixed(2)}%
           </Chip>
         );
       case "actions":
@@ -74,7 +86,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, onDelete }) => {
       <TableBody items={stocks}>
         {(item) => (
           <TableRow key={item.symbol}>
-            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof Stock | "actions")}</TableCell>}
           </TableRow>
         )}
       </TableBody>

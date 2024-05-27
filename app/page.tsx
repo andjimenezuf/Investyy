@@ -6,10 +6,20 @@ import StockTable from "./components/StockTable"; // Import StockTable
 import StockChart from "./components/StockChart"; // Import StockChart
 import { fetchStockData } from "./api/stock"; // Import the fetch function
 
+interface Stock {
+  symbol: string;
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  change: number;
+}
+
 const Page: React.FC = () => {
-  const [stocks, setStocks] = useState([]);
-  const [chartData, setChartData] = useState(null);
-  const [chartSymbol, setChartSymbol] = useState("");
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [chartData, setChartData] = useState<Stock[] | null>(null);
+  const [chartSymbol, setChartSymbol] = useState<string>("");
 
   const handleSearch = async (symbol: string) => {
     const upperSymbol = symbol.toUpperCase();
@@ -21,7 +31,7 @@ const Page: React.FC = () => {
 
     try {
       const data = await fetchStockData(upperSymbol);
-      const newStock = {
+      const newStock: Stock = {
         symbol: upperSymbol,
         ...data[0]
       };
@@ -35,12 +45,17 @@ const Page: React.FC = () => {
     const upperSymbol = symbol.toUpperCase();
     try {
       const data = await fetchStockData(upperSymbol);
-      setChartData(data);
+      const chartDataWithSymbol = data.map((item: Omit<Stock, 'symbol'>) => ({
+        ...item,
+        symbol: upperSymbol,
+      }));
+      setChartData(chartDataWithSymbol);
       setChartSymbol(upperSymbol);
     } catch (error) {
       console.error("Failed to fetch stock data for visualization:", error);
     }
   };
+  
 
   const handleDelete = (symbol: string) => {
     setStocks((prevStocks) => prevStocks.filter(stock => stock.symbol !== symbol));
